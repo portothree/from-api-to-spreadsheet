@@ -33,3 +33,18 @@ auth_resp = requests.post(auth_url, headers=auth_headers, data=auth_data)
 
 # Get the acess key from the response formated as json
 access_token = auth_resp.json()['access_token']
+
+user_headers = {
+    'Authorization': 'Bearer {}'.format(access_token)
+}
+
+user_params = {
+    'screen_name': 'portothree',
+    'count': '1'
+}
+
+user_url = '{}1.1/statuses/user_timeline.json'.format(base_url)
+
+user_resp = requests.get(user_url, headers=user_headers, params=user_params)
+
+print(user_resp.json())
