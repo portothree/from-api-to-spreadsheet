@@ -31,4 +31,5 @@ auth_data = {
 }
 auth_resp = requests.post(auth_url, headers=auth_headers, data=auth_data)
 
-print(auth_resp.status_code)
+# Get the acess key from the response formated as json
+access_token = auth_resp.json()['access_token']
