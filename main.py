@@ -45,6 +45,16 @@ user_params = {
 
 user_url = '{}1.1/statuses/user_timeline.json'.format(base_url)
 
-user_resp = requests.get(user_url, headers=user_headers, params=user_params)
+user_resp = requests.get(user_url, headers=user_headers, params=user_params).json()
 
-print(user_resp.json())
+#Parse the json
+
+for item in user_resp:
+    name = item['user']['name']
+    username = item['user']['screen_name']
+    tweet_id = item['id']
+    tweet_text = item['text']
+
+tweet_URL = 'https://twitter.com/{}/status/'.format(username)+str(tweet_id)
+
+print(name, username, tweet_text, tweet_URL)
