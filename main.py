@@ -1,6 +1,8 @@
 import json
 import base64
 import requests
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 base_url = 'https://api.twitter.com/'
 auth_url = '{}oauth2/token'.format(base_url)
@@ -57,4 +59,11 @@ for item in user_resp:
 
 tweet_URL = 'https://twitter.com/{}/status/'.format(username)+str(tweet_id)
 
-print(name, username, tweet_text, tweet_URL)
+scope = ['https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+client = gspread.authorize(creds)
+sheet = client.open('from-twitter-api').sheet1
+
+row = [name, username, tweet_text, tweet_URL]
+index = 2
+sheet.insert_row(row, index)
