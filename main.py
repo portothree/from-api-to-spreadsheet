@@ -2,12 +2,8 @@ import json
 import base64
 import requests
 import gspread
+import time
 from oauth2client.service_account import ServiceAccountCredentials
-
-scope = ['https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-client = gspread.authorize(creds)
-sheet = client.open('from-twitter-api').sheet1
 
 base_url = 'https://api.twitter.com/'
 auth_url = '{}oauth2/token'.format(base_url)
@@ -50,20 +46,29 @@ user_params = {
     'count': '1'
 }
 
-user_url = '{}1.1/statuses/user_timeline.json'.format(base_url)
+starttime=time.time()
+while True:
 
-user_resp = requests.get(user_url, headers=user_headers, params=user_params).json()
+  user_url = '{}1.1/statuses/user_timeline.json'.format(base_url)
 
-#Parse the json
+  user_resp = requests.get(user_url, headers=user_headers, params=user_params).json()
 
-for item in user_resp:
-    name = item['user']['name']
-    username = item['user']['screen_name']
-    tweet_id = item['id']
-    tweet_text = item['text']
+  #Parse the json
 
-tweet_URL = 'https://twitter.com/{}/status/'.format(username)+str(tweet_id)
+  for item in user_resp:
+      name = item['user']['name']
+      username = item['user']['screen_name']
+      tweet_id = item['id']
+      tweet_text = item['text']
 
-row = [name, username, tweet_text, tweet_URL]
-index = 2
-sheet.insert_row(row, index)
+      tweet_URL = 'https://twitter.com/{}/status/'.format(username)+str(tweet_id)
+
+      scope = ['https://www.googleapis.com/auth/drive']
+      creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+      client = gspread.authorize(creds)
+      sheet = client.open('from-twitter-api').sheet1
+
+      row = [name, username, tweet_text, tweet_URL]
+      index = 2
+      sheet.insert_row(row, index)
+  time.sleep(60.0 - ((time.time() - starttime) % 60.0))
